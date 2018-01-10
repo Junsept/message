@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"     
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/rabbit
+        http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+	<!-- spring 注解支持 -->
+    <context:annotation-config />
+    <context:component-scan base-package="com.rabbitmq" />
+	
+	<!-- 配置RabbitMQ连接工厂 -->
+	<rabbit:connection-factory id="connectionFactory" 
+		host="localhost" 
+		port="5672"
+		username="guest"
+		password="guest"
+	/>
+	
+	<!-- 声明队列、Exchange以及binding -->
+	<rabbit:admin connection-factory="connectionFactory"/>
+	<rabbit:queue name="queue1"/>
+	<rabbit:queue name="queue2"/>
+	<rabbit:queue name="queue3"/>
+	
+	<!-- 如果消息的routing key与binding的routing key直接匹配的话，消息将会路由到该队列上 -->
+	<rabbit:direct-exchange name="direct">
+		<rabbit:bindings>
+			<rabbit:binding queue="queue1" key="1"/>
+			<rabbit:binding queue="queue2" key="2"/>
+			<rabbit:binding queue="queue3" key="3"/>
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+	
+	<!-- 如果消息的routing key与binding的routing key符合通配符匹配的话，消息将会路由到该队列上 -->
+<!-- 	<rabbit:topic-exchange name="topic">
+		<rabbit:bindings>
+			<rabbit:binding queue="queue1" pattern="*.queue"/>
+			<rabbit:binding queue="queue2" pattern="*.queue"/>
+			<rabbit:binding queue="queue3" pattern="*.queueTemp"/>
+		</rabbit:bindings>
+	</rabbit:topic-exchange> -->	
+	
+	<!-- 不管消息的routing key和参数表的头信息/值是什么，消息将会路由到所有队列上 -->
+<!--  	<rabbit:fanout-exchange name="fanout">
+		<rabbit:bindings>
+			<rabbit:binding queue="queue1"/>
+			<rabbit:binding queue="queue2"/>
+			<rabbit:binding queue="queue3"/>
+		</rabbit:bindings>
+	</rabbit:fanout-exchange> -->
+		
+	<!-- 配置RabbitTemplate -->
+	<rabbit:template id="rabbitTemplate"  connection-factory="connectionFactory"/>
+	
+	<!-- 配置消息监听器 -->
+	<bean id="consumerAMQPHandler" class="com.rabbitmq.impl.ConsumerAMQPHandler"></bean>
+	<rabbit:listener-container connection-factory="connectionFactory">
+		<rabbit:listener ref="consumerAMQPHandler" method="handlerMessage" queue-names="queue1,queue2"/>
+	</rabbit:listener-container>
+	
+</beans>
