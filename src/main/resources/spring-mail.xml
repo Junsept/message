@@ -17,11 +17,11 @@
 		<property name="username" value="${mail_username}"></property>
 		<property name="password" value="${mail_password}"></property>
 		<property name="javaMailProperties">  
-            <value>  
-				mail.smtp.auth=true
-				mail.smtp.starttls.enable=true
-				mail.smtp.timeout=5000
-            </value>  
+		    <props>  
+                 <prop key="mail.smtp.auth">true</prop>  
+                 <prop key="mail.smtp.timeout">25000</prop>  
+                 <prop key="mail.smtp.starttls.enable">true</prop>
+             </props>
         </property>
 	</bean>
 	<bean class="org.springframework.mail.SimpleMailMessage"></bean>
