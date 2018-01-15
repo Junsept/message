@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+	
+	<!-- spring 注解支持 -->
+    <context:annotation-config />
+    <context:component-scan base-package="com.mail" />
+	<context:property-placeholder location="classpath:mail.properties"/><!-- 加载配置文件 --> 
+	
+	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail_host}"></property>
+		<property name="username" value="${mail_username}"></property>
+		<property name="password" value="${mail_password}"></property>
+		<property name="javaMailProperties">  
+            <value>  
+				mail.smtp.auth=true
+				mail.smtp.starttls.enable=true
+				mail.smtp.timeout=5000
+            </value>  
+        </property>
+	</bean>
+	<bean class="org.springframework.mail.SimpleMailMessage"></bean>
+
+</beans>
